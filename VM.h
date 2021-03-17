@@ -18,23 +18,38 @@ public:
 };
 
 template <class T>
-class List
+class Iterator
 {
+protected:
   Node<T> *head;
-  Node<T> *tail;
-  Node<T> *temp;
   int size;
 
   bool isEmpty();
+
+public:
+  Iterator()
+  {
+    this->head = NULL;
+    this->size = 0;
+  }
+
+  void forEach(void (*handler)(T, int));
+  void forEach(void (*handler)(T));
+};
+
+template <class T>
+class List : public Iterator<T>
+{
+  Node<T> *tail;
+  Node<T> *temp;
+
   Node<T> *at(int index); // Find an element at its index
 
 public:
-  List()
+  List() : Iterator()
   {
-    this->head = NULL;
     this->tail = NULL;
     this->temp = NULL;
-    this->size = 0;
   }
 
   void push(T x);              // Add an element to the last of the list
@@ -46,19 +61,59 @@ public:
   void display();              // Print all elements in the list
 };
 
+template <class T>
+class Stack : List<T>
+{
+public:
+  T peek(); // Get the top of the stack without removing it from the stack
+};
+
+class Instruction;
+
+typedef void (*handleAddCode)(Instruction);
+
 class VM
 {
-  List<string> *codes;
+  List<Instruction> *codes;
+
+protected:
+  List<Instruction> supportedInstructions;
+
+  void addCode(Instruction instruction) {}
+
+  handleAddCode loadCode(string input)
+  {
+    return this->addCode;
+  };
 
 public:
+  int ip;
+
   VM()
   {
-    this->codes = new List<string>();
+    this->codes = new List<Instruction>();
   }
 
   void run(string filename);
 
   void readCode(string filename);
+};
+
+class Instruction
+{
+protected:
+  VM *vm;
+
+  List<string> loadInstruction(string input, string prefix, int numberOfParams);
+
+public:
+  Instruction(VM *vm)
+  {
+    this->vm = vm;
+  }
+
+  virtual void excute();
+  virtual Instruction load(string input);
 };
 
 #endif
