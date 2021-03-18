@@ -10,11 +10,15 @@ public:
   Node(T x)
   {
     this->next = NULL;
+    this->previous = NULL;
     this->data = x;
   }
 
   T data;
   Node *next;
+  Node *previous;
+
+  void link(Node *previous, Node *next);
 };
 
 template <class T>
@@ -22,89 +26,52 @@ class Iterator
 {
 protected:
   Node<T> *head;
+  Node<T> *tail;
+
   int size;
+  int capacity;
 
   bool isEmpty();
 
 public:
-  Iterator()
+  Iterator(int capacity = -1)
   {
     this->head = NULL;
     this->size = 0;
+    this->capacity = capacity;
   }
 
   void forEach(void (*handler)(T, int));
   void forEach(void (*handler)(T));
-};
-
-template <class T>
-class List : public Iterator<T>
-{
-  Node<T> *tail;
-  Node<T> *temp;
-
-  Node<T> *at(int index); // Find an element at its index
-
-public:
-  List() : Iterator()
-  {
-    this->tail = NULL;
-    this->temp = NULL;
-  }
-
-  void push(T x);              // Add an element to the last of the list
-  T pop();                     // Remove the last element of the list and return it
-  void shift(T x);             // Add an element to the top of the list
-  T unshift();                 // Remove the first element of the list and return it
-  void insert(T x, int index); // Add an element to the list with its position
-  T remove(int index);         // Remove element of the list with its position
-  void display();              // Print all elements in the list
-};
-
-template <class T>
-class Stack : List<T>
-{
-public:
-  T peek(); // Get the top of the stack without removing it from the stack
+  void push(T data);
+  T pop();
+  void display();
+  T at(int index);
+  T peek();
 };
 
 class Instruction;
-
-typedef void (*handleAddCode)(Instruction);
-
 class VM
 {
-  List<Instruction> *codes;
-
-protected:
-  List<Instruction> supportedInstructions;
-
-  void addCode(Instruction instruction) {}
-
-  handleAddCode loadCode(string input)
-  {
-    return this->addCode;
-  };
+private:
+  Iterator<Instruction> *codes;
+  void readCode(string filename);
 
 public:
   int ip;
 
   VM()
   {
-    this->codes = new List<Instruction>();
+    this->codes = new Iterator<Instruction>();
   }
 
   void run(string filename);
-
-  void readCode(string filename);
 };
 
 class Instruction
 {
 protected:
   VM *vm;
-
-  List<string> loadInstruction(string input, string prefix, int numberOfParams);
 
 public:
   Instruction(VM *vm)
@@ -113,7 +80,8 @@ public:
   }
 
   virtual void excute();
-  virtual Instruction load(string input);
+
+  static Instruction load(string input, VM * vm);
 };
 
 #endif
