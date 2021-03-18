@@ -57,13 +57,11 @@ void Iterator<T>::push(T x)
 {
   Node<T> *node = new Node<T>(x);
 
-  if (this->size > this->capacity)
+  if (this->capacity > 0 && this->size > this->capacity)
   {
     // TODO throw the error
     return;
   }
-
-  this->size++;
 
   if (this->isEmpty())
   {
@@ -73,9 +71,12 @@ void Iterator<T>::push(T x)
   else
   {
     node->link(this->tail, NULL);
+    this->tail->link(this->tail->previous, node);
 
     this->tail = node;
   }
+
+  this->size++;
 }
 
 template <class T>
@@ -96,13 +97,14 @@ T Iterator<T>::pop()
 }
 
 template <class T>
+void printData(T data)
+{
+  cout << data << " <-> ";
+}
+
+template <class T>
 void Iterator<T>::display()
 {
-  cout << "NULL <->";
-  void(*printData) = [](T data) {
-    cout << data << " <-> ";
-  };
-
   this->forEach(printData);
 
   cout << "NULL" << endl;
@@ -145,7 +147,10 @@ T Iterator<T>::peek()
 class AddInstruction : public Instruction
 {
 public:
-  AddInstruction(VM *vm) : Instruction(vm) {}
+  AddInstruction(VM *vm) : Instruction(vm)
+  {
+    this->name = "Add";
+  }
 
   virtual void excute() {}
 };
@@ -154,11 +159,41 @@ public:
 
 #pragma region Instructions
 
-Instruction Instruction::load(string input, VM *vm)
+Iterator<string> tokenize(string s, string del = " ")
 {
-  cout << input;
+  Iterator<string> tokens = Iterator<string>();
+  int start = 0;
+  int end = s.find(del);
+  while (end != -1)
+  {
+    string word = s.substr(start, end - start);
 
-  return AddInstruction(vm);
+    tokens.push(word);
+
+    start = end + del.size();
+    end = s.find(del, start);
+  }
+
+  string word = s.substr(start, end - start);
+
+  tokens.push(word);
+
+  return tokens;
+}
+
+void Instruction::excute()
+{
+}
+
+Instruction *Instruction::load(string input, VM *vm)
+{
+  Iterator<string> params = tokenize(input);
+
+  // TODO load instruction
+  params.display();
+  Instruction *instruction = new AddInstruction(vm);
+
+  return instruction;
 }
 
 #pragma endregion
@@ -178,10 +213,21 @@ void VM::readCode(string filename)
 
   while (getline(infile, line))
   {
-    Instruction instruction = Instruction::load(line, this);
+    Instruction *instruction = Instruction::load(line, this);
 
     this->codes->push(instruction);
   }
+}
+
+#pragma endregion
+
+#pragma region IN / OUT Helpers
+
+std::ostream &operator<<(std::ostream &os, const Instruction *instruction)
+{
+  os << instruction->name;
+
+  return os;
 }
 
 #pragma endregion

@@ -34,7 +34,14 @@ protected:
   bool isEmpty();
 
 public:
-  Iterator(int capacity = -1)
+  Iterator()
+  {
+    this->head = NULL;
+    this->size = 0;
+    this->capacity = 0;
+  }
+
+  Iterator(int capacity)
   {
     this->head = NULL;
     this->size = 0;
@@ -54,7 +61,7 @@ class Instruction;
 class VM
 {
 private:
-  Iterator<Instruction> *codes;
+  Iterator<Instruction *> *codes;
   void readCode(string filename);
 
 public:
@@ -62,7 +69,7 @@ public:
 
   VM()
   {
-    this->codes = new Iterator<Instruction>();
+    this->codes = new Iterator<Instruction *>();
   }
 
   void run(string filename);
@@ -74,6 +81,8 @@ protected:
   VM *vm;
 
 public:
+  string name = "Undefined";
+
   Instruction(VM *vm)
   {
     this->vm = vm;
@@ -81,7 +90,7 @@ public:
 
   virtual void excute();
 
-  static Instruction load(string input, VM * vm);
+  static Instruction *load(string input, VM *vm);
 };
 
 #endif
