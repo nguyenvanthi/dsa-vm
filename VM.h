@@ -61,6 +61,8 @@ class Instruction;
 class VM
 {
 private:
+  Iterator<void *> *memories;
+  Iterator<int> *stack;
   Iterator<Instruction *> *codes;
   void readCode(string filename);
 
@@ -70,7 +72,9 @@ public:
   VM()
   {
     this->ip = 0;
-    this->codes = new Iterator<Instruction *>();
+    this->codes = new Iterator<Instruction *>(65536);
+    this->memories = new Iterator<void *>(65536);
+    this->stack = new Iterator<int>(1000);
   }
 
   void run(string filename);

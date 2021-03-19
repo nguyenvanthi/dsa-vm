@@ -227,6 +227,8 @@ void VM::readCode(string filename)
 
     this->codes->push(instruction);
   }
+
+  this->ip = 0;
 }
 
 #pragma endregion
