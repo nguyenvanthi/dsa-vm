@@ -28,12 +28,12 @@ protected:
   Node<T> *head;
   Node<T> *tail;
 
-  int size;
   int capacity;
 
   bool isEmpty();
 
 public:
+  int size;
   Iterator()
   {
     this->head = NULL;
@@ -69,6 +69,7 @@ public:
 
   VM()
   {
+    this->ip = 0;
     this->codes = new Iterator<Instruction *>();
   }
 
@@ -78,14 +79,22 @@ public:
 class Instruction
 {
 protected:
+  int numberOfParams;
   VM *vm;
+  Iterator<string> params;
+
+  void validateParams();
 
 public:
   string name = "Undefined";
 
-  Instruction(VM *vm)
+  Instruction(VM *vm, Iterator<string> params, int numberOfParams)
   {
     this->vm = vm;
+    this->params = params;
+    this->numberOfParams = numberOfParams;
+
+    this->validateParams();
   }
 
   virtual void excute();

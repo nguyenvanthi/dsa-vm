@@ -147,9 +147,10 @@ T Iterator<T>::peek()
 class AddInstruction : public Instruction
 {
 public:
-  AddInstruction(VM *vm) : Instruction(vm)
+  AddInstruction(VM *vm, Iterator<string> params) : Instruction(vm, params, 3)
   {
     this->name = "Add";
+    this->numberOfParams = 3;
   }
 
   virtual void excute() {}
@@ -190,10 +191,17 @@ Instruction *Instruction::load(string input, VM *vm)
   Iterator<string> params = tokenize(input);
 
   // TODO load instruction
-  params.display();
-  Instruction *instruction = new AddInstruction(vm);
+  Instruction *instruction = new AddInstruction(vm, params);
 
   return instruction;
+}
+
+void Instruction::validateParams()
+{
+  if (this->params.size != this->numberOfParams)
+  {
+    throw InvalidInstruction(this->vm->ip);
+  }
 }
 
 #pragma endregion
@@ -214,6 +222,8 @@ void VM::readCode(string filename)
   while (getline(infile, line))
   {
     Instruction *instruction = Instruction::load(line, this);
+
+    this->ip++;
 
     this->codes->push(instruction);
   }
