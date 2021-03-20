@@ -113,21 +113,25 @@ void Iterator<T>::display()
 template <class T>
 T Iterator<T>::at(int index)
 {
-  if (index < = || index > this->size)
+  if (index < 0 || index > this->size)
   {
     // TODO throw the error
   }
 
   T result;
+  Node<T> *node = this->head;
+  int currentIndex = 0;
 
-  void(*setResult) = [](T data, int currentIndex) {
-    if (index == currentIndex)
+  while (node != NULL)
+  {
+    if (currentIndex++ == index)
     {
-      result = currentIndex;
+      result = node->data;
+      break;
     }
-  };
 
-  this->forEach(setResult);
+    node = node->next;
+  }
 
   return result;
 }
