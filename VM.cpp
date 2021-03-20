@@ -189,9 +189,13 @@ void Instruction::excute()
 Instruction *Instruction::load(string input, VM *vm)
 {
   Iterator<string> params = tokenize(input);
+  Instruction *instruction;
 
+  if (params.at(0).compare("Add") == 0)
+  {
+    instruction = new AddInstruction(vm, params);
+  }
   // TODO load instruction
-  Instruction *instruction = new AddInstruction(vm, params);
 
   return instruction;
 }
