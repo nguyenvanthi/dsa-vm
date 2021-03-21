@@ -64,6 +64,7 @@ private:
   Iterator<void *> *memories;
   Iterator<int> *stack;
   Iterator<Instruction *> *codes;
+  Iterator<int> *registers;
   void readCode(string filename);
 
 public:
@@ -75,6 +76,7 @@ public:
     this->codes = new Iterator<Instruction *>(65536);
     this->memories = new Iterator<void *>(65536);
     this->stack = new Iterator<int>(1000);
+    this->registers = new Iterator<int>(15);
   }
 
   void run(string filename);
@@ -88,6 +90,7 @@ protected:
   Iterator<string> params;
 
   void validateParams();
+  void initialize();
 
 public:
   string name = "Undefined";
@@ -99,6 +102,7 @@ public:
     this->numberOfParams = numberOfParams;
 
     this->validateParams();
+    this->initialize();
   }
 
   virtual void excute();

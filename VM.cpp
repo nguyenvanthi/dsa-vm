@@ -1,4 +1,7 @@
 #include "VM.h"
+#define REGISTER_PREFIX "R"
+
+#define ADD_INSTRUCTION "Add"
 
 #pragma region Node
 
@@ -153,7 +156,7 @@ class AddInstruction : public Instruction
 public:
   AddInstruction(VM *vm, Iterator<string> params) : Instruction(vm, params, 3)
   {
-    this->name = "Add";
+    this->name = ADD_INSTRUCTION;
     this->numberOfParams = 3;
   }
 
@@ -190,12 +193,16 @@ void Instruction::excute()
 {
 }
 
+void Instruction::initialize()
+{
+}
+
 Instruction *Instruction::load(string input, VM *vm)
 {
   Iterator<string> params = tokenize(input);
   Instruction *instruction;
 
-  if (params.at(0).compare("Add") == 0)
+  if (params.at(0).compare(ADD_INSTRUCTION) == 0)
   {
     instruction = new AddInstruction(vm, params);
   }
@@ -209,6 +216,17 @@ void Instruction::validateParams()
   if (this->params.size != this->numberOfParams)
   {
     throw InvalidInstruction(this->vm->ip);
+  }
+
+  if (this->numberOfParams > 1)
+  {
+    string param = this->params.at(1);
+
+    // TODO exclude Jump, Call
+    if (param.rfind(REGISTER_PREFIX, 0) != 0)
+    {
+      throw InvalidInstruction(this->vm->ip);
+    }
   }
 }
 
